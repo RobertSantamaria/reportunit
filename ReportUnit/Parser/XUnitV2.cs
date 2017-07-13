@@ -19,61 +19,69 @@ namespace ReportUnit.Parser
         {
             _resultsFile = resultsFile;
 
-            var doc = XDocument.Load(resultsFile);
+            XDocument doc = XDocument.Load(resultsFile);
 
             if (doc.Root == null)
             {
                 throw new NullReferenceException();
             }
 
-            var report = new Report
+            XAttribute assembly = doc.Root.Attribute("name");
+
+            Report report = new Report
             {
                 FileName = Path.GetFileNameWithoutExtension(resultsFile),
-                AssemblyName = doc.Root.Attribute("name") != null ? doc.Root.Attribute("name").Value : null,
+                AssemblyName = assembly != null ? assembly.Value : "",
                 TestRunner = TestRunner.XUnitV2
             };
 
             // run-info & environment values -> RunInfo
-            var runInfo = CreateRunInfo(doc, report);
+            RunInfo runInfo = CreateRunInfo(doc, report);
             if (runInfo != null)
             {
                 report.AddRunInfo(runInfo.Info);
             }
 
             // report status messages
-            var suites = doc.Descendants("collection");
+            IEnumerable<XElement> suites = doc.Descendants("collection");
 
             suites.AsParallel().ToList().ForEach(ts =>
             {
-                var testSuite = new TestSuite();
-                testSuite.Name = ts.Attribute("name").Value;
+                TestSuite testSuite = new TestSuite();
+                string suiteName = ts.Attribute("name").Value;
+                testSuite.Name = suiteName != null ? suiteName : "";
 
                 // Suite Time Info
-                testSuite.Duration = double.Parse(ts.Attribute("time").Value);
+                string suiteTime = ts.Attribute("time").Value;
+                testSuite.Duration = suiteTime != null ? double.Parse(suiteTime) : 0;
 
                 // Test Cases
                 ts.Descendants("test").AsParallel().ToList().ForEach(tc =>
                 {
-                    var test = new Test();
+                    Test test = new Test();
 
-                    test.Name = tc.Attribute("name").Value;
-                    test.Status = StatusExtensions.ToStatus(tc.Attribute("result").Value);
+                    string testName = tc.Attribute("name").Value;
+                    test.Name = testName != null ? testName : "";
+
+                    string result = tc.Attribute("result").Value;
+                    test.Status = result != null ? StatusExtensions.ToStatus(result) : Status.Unknown;
 
                     // main a master list of all status
                     // used to build the status filter in the view
                     report.StatusList.Add(test.Status);
 
                     // TestCase Time Info
-                    test.Duration = double.Parse(tc.Attribute("time").Value);
+                    string time = tc.Attribute("time").Value;
+                    test.Duration = time != null ? double.Parse(time) : 0;
 
                     // get test case level categories
-                    var categories = this.GetCategories(tc, true);
+                    HashSet<string> categories = GetCategories(tc, true);
 
                     // error and other status messages
                     test.StatusMessage = tc.Element("failure") != null
                             ? tc.Element("failure").Element("message").Value.Trim()
                             : "";
-                    var stackTrace = tc.Element("failure") != null
+                    string stackTrace = tc.Element("failure") != null
                             ? tc.Element("failure").Element("stack-trace").Value.Trim()
                             : "";
 
@@ -107,16 +115,16 @@ namespace ReportUnit.Parser
                 : new Func<XElement, string, IEnumerable<XElement>>((e, s) => e.Elements(s));
 
             //Grab unique categories
-            var categories = new HashSet<string>();
-            var hasCategories = parser(elem, "traits").Any();
+            HashSet<string> categories = new HashSet<string>();
+            bool hasCategories = parser(elem, "traits").Any();
             if (hasCategories)
             {
-                var cats = parser(elem, "traits").Elements("trait").ToList();
+                List<XElement> cats = parser(elem, "traits").Elements("trait").ToList();
 
                 cats.ForEach(x =>
                 {
-                    var cat = x.Attribute("name").Value;
-                    var val = x.Attribute("value").Value;
+                    string cat = x.Attribute("name").Value;
+                    string val = x.Attribute("value").Value;
                     categories.Add(string.Concat(cat, ";" , val));
                 });
             }
@@ -129,10 +137,10 @@ namespace ReportUnit.Parser
             if (doc.Element("assemblies") == null)
                 return null;
 
-            var runInfo = new RunInfo();
+            RunInfo runInfo = new RunInfo();
             runInfo.TestRunner = report.TestRunner;
 
-            var env = doc.Descendants("assembly").First();
+            XElement env = doc.Descendants("assembly").First();
             runInfo.Info.Add("Test results file", _resultsFile);
             runInfo.Info.Add("Test framework", env.Attribute("test-framework").Value);
             runInfo.Info.Add("Assembly name", env.Attribute("name").Value);
