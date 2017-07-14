@@ -45,7 +45,7 @@
                         <a class="modal-trigger waves-effect waves-light run-info-icon tooltipped" data-position="bottom" data-tooltip="Run Info" href="#modal1"><i class="mdi-action-info-outline"></i></a>
                     </li>
                     <li class="nav-item">
-                        v1.50.0
+                        v1.50.1
                     </li>
                 </ul>
             </nav>
@@ -75,30 +75,26 @@
                 <div class="row dashboard">
                     <div class="col s12 m6 l4">
                         <div class="card-panel">
-                            <div title="Count of all passed tests">Suite Summary</div>    
+                            <div class="card-title">Suites Summary</div>
                             <div class="chart-box">
                                 <canvas class="text-centered" id="suite-analysis"></canvas>
                             </div>
-                            <div>
-                                <span class="weight-light"><span class="suite-pass-count weight-normal"></span> suites(s) passed</span>
-                            </div> 
-                            <div>
+                            <div class="right-align">
+                                <span class="weight-light"><span class="suite-pass-count weight-normal"></span> suites(s) passed, </span>
                                 <span class="weight-light"><span class="suite-fail-count weight-normal"></span> suites(s) failed, <span class="suite-others-count weight-normal"></span> others</span>
-                            </div> 
+                            </div>
                         </div>
                     </div>
                     <div class="col s12 m6 l4">
                         <div class="card-panel">
-                            <div title="Count of all failed tests">Tests Summary</div>
+                            <div class="card-title">Tests Summary</div>
                             <div class="chart-box">
                                 <canvas class="text-centered" id="test-analysis"></canvas>
                             </div>
-                            <div>
-                                <span class="weight-light"><span class="test-pass-count weight-normal">@Model.Passed</span> test(s) passed</span>
-                            </div> 
-                            <div>
+                            <div class="right-align">
+                                <span class="weight-light"><span class="test-pass-count weight-normal">@Model.Passed</span> test(s) passed, </span>
                                 <span class="weight-light"><span class="test-fail-count weight-normal">@Model.Failed</span> test(s) failed, <span class="test-others-count weight-normal">@(Model.Total - (Model.Passed + Model.Failed))</span> others</span>
-                            </div> 
+                            </div>
                         </div>
                     </div>
                     <div class="col s12 m12 l4">
@@ -117,46 +113,15 @@
                             <div class="card-panel no-padding no-margin-v suite-list v-spacer">
                                 <div class="filters card-panel">
                                     <div>
-                                        <a class="dropdown-button button" href="#" data-hover="true" data-beloworigin="true" data-constrainwidth="true" data-activates="suite-toggle" title="Filter suites"><i class="mdi-file-folder-open icon"></i></a><ul class="dropdown-content" id="suite-toggle"></ul>
-                                        <ul>
+                                        <h5>Test Suites</h5>
+                                        <ul id="suites-dropdown" class="dropdown-content">
                                             @foreach (var status in Model.StatusList.Distinct().ToList())
                                             {
                                                 <li class="@status.ToString()"><a href="#!">@status.ToString()</a></li>
                                             }
-                                            <li class="divider"></li> 
-                                            <li class="clear"><a href="#!">Clear Filters</a></li> 
                                         </ul>
-                                    </div> 
-                                    <div>
-                                        <a class="dropdown-button button" href="#" data-hover="true" data-beloworigin="true" data-constrainwidth="true" data-activates="tests-toggle" title="Filter tests"><i class="mdi-action-subject icon"></i></a><ul class="dropdown-content" id="tests-toggle"></ul>
-                                        <ul>
-                                            @foreach (var status in Model.StatusList.Distinct().ToList())
-                                            {
-                                                <li class="@status.ToString()"><a href="#!">@status.ToString()</a></li>
-                                            }
-                                            <li class="divider"></li> 
-                                            <li class="clear"><a href="#!">Clear Filters</a></li> 
-                                        </ul>
-                                    </div> 
-                                    @if (Model.CategoryList.Count > 0) 
-                                    {
-                                        <div> 
-                                            <a class="category-toggle dropdown-button button" href="#" data-hover="true" data-beloworigin="true" data-constrainwidth="false" data-activates="category-toggle" title="Filter categories"><i class="mdi-image-style icon"></i></a><ul class="dropdown-content" id="category-toggle"></ul>
-                                            <ul>
-                                                @foreach (var cat in Model.CategoryList.Distinct().ToList())
-                                                {
-                                                    <li class="@cat"><a href="#!">@cat</a></li>
-                                                }
-                                                <li class="divider"></li> 
-                                                <li class="clear"><a href="#!">Clear Filters</a></li> 
-                                            </ul> 
-                                        </div> 
-                                    }
-                                    <div>
-                                        <a title="Clear Filters" id="clear-filters" class="clear"><i class="mdi-navigation-close icon"></i></a> 
-                                    </div> &nbsp;
-                                    <div> 
-                                        <a title="Enable Dashboard" id="enableDashboard" class="enabled"><i class="mdi-action-track-changes icon active"></i></a> 
+                                        <i type="button" class="small material-icons btn dropdown-button" href="#" data-activates="suites-dropdown">list</i>
+                                        <button type="button" class="btn clear">Clear</button>
                                     </div>
                                 </div>
                                 <ul id="suite-collection" class="no-margin-v">
@@ -236,8 +201,7 @@
                                                                     if (!String.IsNullOrEmpty(@test.StatusMessage)) 
                                                                     {
                                                                         <td>
-                                                                                    
-                                                                            <div class="badge showStatusMessage error"><i class="mdi-alert-warning"></i></div>
+                                                                            <button type="button" class="btn" data-toggle="modal" data-target="#modal2">Message</button>
                                                                             <pre class="hide">@test.StatusMessage.Replace("<", "&lt;").Replace(">", "&gt;")</pre>
                                                                         </td>
                                                                     }
@@ -259,6 +223,14 @@
                         <div class="col">
                             <div class="card-panel suite-details no-margin-v v-spacer">
                                 <h5 class="suite-name-displayed"></h5>
+                                    <ul id="tests-dropdown" class="dropdown-content">
+                                    @foreach (var status in Model.StatusList.Distinct().ToList())
+                                    {
+                                        <li class="@status.ToString()"><a href="#!">@status.ToString()</a></li>
+                                    }
+                                    </ul>
+                                    <a type="button" class="small material-icons btn dropdown-button" href="#" data-activates="tests-dropdown" data-hover="true" title="Filter tests">list</a>
+                                    <button type="button" class="btn clear">Clear</button>
                                 <div class="details-container"></div>
                             </div>
                         </div>
@@ -305,9 +277,24 @@
             <div class="hidden total-skipped"><!--%SKIPPED%--></div>
         </div>
 		
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js" type="text/javascript"></script>
+        <div id="modal2" class="modal">
+		    <div class="modal-content">
+                <div class="modal-header">
+                    <h4 id="modal-title"></h4>
+                </div>
+		        <div class="modal-body">
+                    <div id="modal-message">No message found</div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js" type="text/javascript"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" type="text/javascript"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.2/js/materialize.min.js" type="text/javascript"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js" type="text/javascript"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.1.1/Chart.min.js" type="text/javascript"></script>
         <script src="file:///C:/Users/roberto/Documents/Visual Studio 2017/Projects/ReportUnit/cdn/reportunit.js" type="text/javascript"></script>
 
     </body>
