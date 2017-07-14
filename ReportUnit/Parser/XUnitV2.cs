@@ -78,14 +78,18 @@ namespace ReportUnit.Parser
                     HashSet<string> categories = GetCategories(tc, true);
 
                     // error and other status messages
-                    test.StatusMessage = tc.Element("failure") != null
-                            ? tc.Element("failure").Element("message").Value.Trim()
-                            : "";
-                    string stackTrace = tc.Element("failure") != null
-                            ? tc.Element("failure").Element("stack-trace").Value.Trim()
-                            : "";
+                    XElement failure = tc.Element("failure");
+                    if (failure != null)
+                    {
+                        string exceptionType = failure.Attribute("exception-type").Value;
+                        test.StatusMessage = exceptionType != null ? string.Concat(exceptionType, Environment.NewLine) : "";
 
-                    test.StatusMessage += stackTrace;
+                        string message = failure.Element("message").Value;
+                        test.StatusMessage += message != null ? string.Concat(message, Environment.NewLine) : "";
+
+                        string stackTrace = failure.Element("stack-trace").Value;
+                        test.StatusMessage += stackTrace != null ? string.Concat(stackTrace, Environment.NewLine) : "";
+                    }
 
                     testSuite.TestList.Add(test);
                 });

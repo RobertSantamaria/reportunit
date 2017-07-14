@@ -133,11 +133,7 @@
                                                 <div class="suite-result @Model.TestSuiteList[ix].Status.ToString().ToLower() right label">@Model.TestSuiteList[ix].Status.ToString()</div>
                                             </div>
                                             <div class="suite-content hide">
-                                                <span title="Suite started at time" class="startedAt label green lighten-2 text-white">@Model.TestSuiteList[ix].StartTime</span>
-                                                @if (!String.IsNullOrEmpty(@Model.TestSuiteList[ix].EndTime))
-                                                {
-                                                    <span title="Suite ended at time" class="endedAt label label red lighten-2 text-white">@Model.TestSuiteList[ix].EndTime</span>
-                                                }
+                                                <span title="Suite execution time" class="startedAt label green lighten-2 text-white">@Model.TestSuiteList[ix].Duration</span>
                                                 <div class="fixture-status-message">
                                                     @if (!String.IsNullOrEmpty(@Model.TestSuiteList[ix].Description)) 
                                                     {
@@ -153,10 +149,6 @@
                                                         <tr>
                                                             <th>TestName</th>
                                                             <th>Status</th>
-                                                            @if (Model.TestSuiteList.Count > 0 && Model.TestSuiteList[ix].TestList.Any(x => x.CategoryList.Count > 0))
-                                                            {
-                                                                <th>Category</th>
-                                                            }
                                                             @if (Model.TestSuiteList.Count > 0 && Model.TestSuiteList[ix].TestList.Where(x => !String.IsNullOrEmpty(x.Description) || !String.IsNullOrEmpty(x.StatusMessage)).Count() > 0) 
                                                             {
                                                                 <th>StatusMessage</th>
@@ -169,33 +161,11 @@
                                                             <tr class="@test.Status.ToString().ToLower() test-status">
                                                                 <td class="test-name">
                                                                     @{var testName = test.Name.Replace("<", "&lt;").Replace(">", "&gt;");}
-                                                                    @if (!String.IsNullOrEmpty(@test.Description))
-                                                                    {
-                                                                        <a class="showDescription name" href="#">@testName</a>
-                                                                        <p class="hide description">@test.Description</p>
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        <span class="name">@testName</span>
-                                                                    }
+                                                                    <span class="name">@testName</span>
                                                                 </td>
                                                                 <td class="test-status @test.Status.ToString().ToLower()">
                                                                     <span class="label @test.Status.ToString().ToLower()">@test.Status.ToString()</span>
                                                                 </td>
-                                                                @if (Model.TestSuiteList.Count > 0 && Model.TestSuiteList[ix].TestList.Any(x => x.CategoryList.Count > 0))
-                                                                {
-                                                                    <td>
-                                                                        @if (test.CategoryList.Count > 0)
-                                                                        {
-                                                                            <div class="category-list">
-                                                                                @foreach (var cat in test.CategoryList)
-                                                                                {
-                                                                                    <span class="label category">@cat</span>
-                                                                                }
-                                                                            </div>
-                                                                        }
-                                                                    </td>
-                                                                }
                                                                 @if (Model.TestSuiteList.Count > 0 && Model.TestSuiteList[ix].TestList.Where(x => !String.IsNullOrEmpty(x.StatusMessage)).Count() > 0) 
                                                                 {
                                                                     if (!String.IsNullOrEmpty(@test.StatusMessage)) 
@@ -272,7 +242,6 @@
             <div class="hidden total-tests"><!--%TOTALTESTS%--></div>
             <div class="hidden total-passed"><!--%PASSED%--></div>
             <div class="hidden total-failed"><!--%FAILED%--></div>
-            <div class="hidden total-inconclusive"><!--%INCONCLUSIVE%--></div>
             <div class="hidden total-errors"><!--%ERRORS%--></div>
             <div class="hidden total-skipped"><!--%SKIPPED%--></div>
         </div>
