@@ -80,8 +80,6 @@ namespace ReportUnit
                 var html = Engine.Razor.RunCompile(Templates.TemplateManager.GetFileTemplate(), "report", typeof(Model.Report), report, null);
                 File.WriteAllText(Path.Combine(outputDirectory, report.FileName + ".html"), html);
             }
-
-            CopyResourceFiles(outputDirectory);
         }
 
         private TestRunner GetTestRunner(string inputFile)
@@ -101,30 +99,6 @@ namespace ReportUnit
             templateConfig.CachingProvider = new DefaultCachingProvider(x => { });
             var service = RazorEngineService.Create(templateConfig);
             Engine.Razor = service;
-        }
-
-        private void CopyResourceFiles(string outputDirectory)
-        {
-            string resourcesDirectory = Path.Combine(Directory.GetCurrentDirectory(), "Resources");
-            if (Directory.Exists(resourcesDirectory))
-            {
-                string outputResourcesDirectory = Path.Combine(outputDirectory, "Resources");
-                if (Directory.Exists(outputResourcesDirectory))
-                {
-                    Directory.Delete(outputResourcesDirectory, true);
-                }
-                Directory.CreateDirectory(outputResourcesDirectory);
-
-                string[] files = Directory.GetFiles(resourcesDirectory);
-                foreach (string fileName in files)
-                {
-                    File.Copy(fileName, Path.Combine(outputResourcesDirectory, Path.GetFileName(fileName)));
-                }
-            }
-            else
-            {
-                Console.WriteLine("Resources was not found");
-            }
         }
     }
 }
