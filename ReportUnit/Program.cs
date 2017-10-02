@@ -37,8 +37,6 @@ namespace ReportUnit
         /// </param>
         static void Main(string[] args)
         {
-            CopyrightMessage();
-
             if (args.Length == 0 || args.Length > 2)
             {
                 _logger.Error("Invalid number of arguments specified.\n" + Usage);
@@ -105,14 +103,5 @@ namespace ReportUnit
 
             new ReportUnitService().CreateReport(args[0], args[0]);
         }
-
-        private static void CopyrightMessage()
-        {
-            Console.WriteLine("\n--\nReportUnit v1.5. Report generator for the test-runner family.");
-            Console.WriteLine("http://reportunit.relevantcodes.com/");
-            Console.WriteLine("Copyright (c) 2015 Anshoo Arora (Relevant Codes)");
-            Console.WriteLine("Developers:  Anshoo Arora, Sandra Greenhalgh\n--\n");
-        }
-
     }
 }

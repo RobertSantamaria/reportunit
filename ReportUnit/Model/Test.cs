@@ -18,6 +18,8 @@ namespace ReportUnit.Model
         /// </summary>
         public string StatusMessage { get; set; }
 
+        public string StackTrace { get; set; }
+
         public string StartTime { get; set; }
 
         public string EndTime { get; set; }

@@ -140,6 +140,7 @@ th, td {
 }
 .collapsible-header {
   display: block;
+  font-size: 12px;
 }
 .collapsible-header div {
   float: left;

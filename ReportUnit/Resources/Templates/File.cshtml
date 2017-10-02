@@ -2,269 +2,188 @@
 @inherits RazorEngine.Templating.TemplateBase<Report>
 <!DOCTYPE html>
 <html lang="en">
-<!--
-    ReportUnit 1.5 | http://reportunit.relevantcodes.com/
-    Created by Anshoo Arora (Relevant Codes) | Released under the MIT license
-
-    Template from:
-
-        ExtentReports Library | http://relevantcodes.com/extentreports-for-selenium/ | https://github.com/anshooarora/
-        Copyright (c) 2015, Anshoo Arora (Relevant Codes) | Copyrights licensed under the New BSD License | http://opensource.org/licenses/BSD-3-Clause
-        Documentation: http://extentreports.relevantcodes.com 
--->
     <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>ReportUnit</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="description" content="">
-        <meta name="author" content="">
-        <title>ReportUnit TestRunner Report</title>
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.99.0/css/materialize.min.css" rel="stylesheet" type="text/css">
-        <link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" type="text/css">
-        <link href="https://cdn.rawgit.com/reportunit/reportunit/005dcf934c5a53e60b9ec88a2a118930b433c453/cdn/reportunit.css" type="text/css" rel="stylesheet" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+        <link rel="stylesheet" href="https://git.illumina.com/ralgarra/reportunit/cdn/reportunit.css">
+        <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js"></script>
+        <script type="text/javascript" src="https://git.illumina.com/ralgarra/reportunit/cdn/reportunit.js"></script>
     </head>
     <body>
-
-
-        <div class="header">
-            <nav>
-                <ul id="slide-out" class="side-nav fixed">
-                    @Model.SideNavLinks
-                </ul>
-
-                <span class="file-name">@Model.FileName</span>
-                            
-                <ul class="left">
-                    <li class="logo">
-                        <a href="http://reportunit.relevantcodes.com/"><span>ReportUnit</span></a>
-                    </li>
-                </ul>
-
-                <ul class="right nav-right">
-                    <li class="nav-item">
-                        <a class="modal-trigger waves-effect waves-light run-info-icon tooltipped" data-position="bottom" data-tooltip="Run Info" href="#modal1"><i class="mdi-action-info-outline"></i></a>
-                    </li>
-                    <li class="nav-item">
-                        v1.50.1
-                    </li>
-                </ul>
-            </nav>
-        </div>
         <div class="main">
-            <div class="main-wrap">
-                @if (Model.Total == 0)
-                {
-                    <div class="row no-tests">
-                        <div clas="col s12 m6 l4">
-                            <div class="no-tests-message card-panel no-margin-v">
-                                <p>
-                                    No tests were found in @Model.FileName.
-                                </p>
-                                @if (!String.IsNullOrEmpty(@Model.StatusMessage))
-                                {
-                                    <pre>
-                                        @Model.StatusMessage
-                                    </pre>
-                                }
-                            </div>
+            <div class="row">
+                <div class="col l3 dashboard">
+                    <div class="card-panel">
+                        <div class="card-title"><b>Test analysis</b></div>
+                        <div class="card-content analysis">
+                            <canvas id="test-analysis"></canvas>
+                            <div id="legend"></div>
                         </div>
                     </div>
-                }
-                else
-                {
-                <div class="row dashboard">
-                    <div class="col s12 m6 l4">
-                        <div class="card-panel">
-                            <div class="card-title">Suites Summary</div>
-                            <div class="chart-box">
-                                <canvas class="text-centered" id="suite-analysis"></canvas>
+                </div>
+                <div class="col l3 dashboard">
+                    <div class="card-panel">
+                        <div class="card-title"><b>Pass percentage</b></div>
+                        <div class="card-content statistics">
+                            <div class="panel-lead">
+                                <div class="pass-percentage"></div>
+                                <div class="stats">
+                                    <div id="tests-passed"></div>
+                                    <div id="total-tests"></div>
+                                </div>
                             </div>
-                            <div class="right-align">
-                                <span class="weight-light"><span class="suite-pass-count weight-normal"></span> suites(s) passed, </span>
-                                <span class="weight-light"><span class="suite-fail-count weight-normal"></span> suites(s) failed, <span class="suite-others-count weight-normal"></span> others</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col s12 m6 l4">
-                        <div class="card-panel">
-                            <div class="card-title">Tests Summary</div>
-                            <div class="chart-box">
-                                <canvas class="text-centered" id="test-analysis"></canvas>
-                            </div>
-                            <div class="right-align">
-                                <span class="weight-light"><span class="test-pass-count weight-normal">@Model.Passed</span> test(s) passed, </span>
-                                <span class="weight-light"><span class="test-fail-count weight-normal">@Model.Failed</span> test(s) failed, <span class="test-others-count weight-normal">@(Model.Total - (Model.Passed + Model.Failed))</span> others</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col s12 m12 l4">
-                        <div class="card-panel">
-                            <div title="Count of all inconclusive tests">Pass Percentage</div>
-                            <div class="panel-lead pass-percentage"></div>
                             <div class="progress">
                                 <div class="determinate"></div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div id="suites" class="suites">
-                        <div class="col">
-                            <div class="card-panel no-padding no-margin-v suite-list v-spacer">
-                                <div class="filters card-panel">
-                                    <div>
-                                        <h5>Test Suites</h5>
-                                        <ul id="suites-dropdown" class="dropdown-content">
-                                            @foreach (var status in Model.StatusList.Distinct().ToList())
-                                            {
-                                                <li class="@status.ToString()"><a href="#!">@status.ToString()</a></li>
-                                            }
-                                        </ul>
-                                        <i type="button" class="small material-icons btn dropdown-button" href="#" data-activates="suites-dropdown">list</i>
-                                        <button type="button" class="btn clear">Clear</button>
-                                    </div>
-                                </div>
-                                <ul id="suite-collection" class="no-margin-v">
-                                    @for (var ix = 0; ix < Model.TestSuiteList.Count; ix++)
-                                    {
-                                        <li class="suite @Model.TestSuiteList[ix].Status.ToString().ToLower()">
-                                            <div class="suite-head">
-                                                <div class="suite-name">@Model.TestSuiteList[ix].Name</div>
-                                                <div class="suite-result @Model.TestSuiteList[ix].Status.ToString().ToLower() right label">@Model.TestSuiteList[ix].Status.ToString()</div>
-                                            </div>
-                                            <div class="suite-content hide">
-                                                <span title="Suite execution time" class="startedAt label green lighten-2 text-white">@Model.TestSuiteList[ix].Duration</span>
-                                                <div class="fixture-status-message">
-                                                    @if (!String.IsNullOrEmpty(@Model.TestSuiteList[ix].Description)) 
-                                                    {
-                                                        <div class="suite-desc">@Model.TestSuiteList[ix].Description</div>
-                                                    }
-                                                    @if (!String.IsNullOrEmpty(@Model.TestSuiteList[ix].StatusMessage)) 
-                                                    {
-                                                        <div class="suite-desc">@Model.TestSuiteList[ix].StatusMessage</div>
-                                                    }
-                                                </div>
-                                                <table class="bordered">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>TestName</th>
-                                                            <th>Status</th>
-                                                            @if (Model.TestSuiteList.Count > 0 && Model.TestSuiteList[ix].TestList.Where(x => !String.IsNullOrEmpty(x.Description) || !String.IsNullOrEmpty(x.StatusMessage)).Count() > 0) 
-                                                            {
-                                                                <th>StatusMessage</th>
-                                                            }
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        @foreach (var test in Model.TestSuiteList[ix].TestList)
-                                                        {
-                                                            <tr class="@test.Status.ToString().ToLower() test-status">
-                                                                <td class="test-name">
-                                                                    @{var testName = test.Name.Replace("<", "&lt;").Replace(">", "&gt;");}
-                                                                    <span class="name">@testName</span>
-                                                                </td>
-                                                                <td class="test-status @test.Status.ToString().ToLower()">
-                                                                    <span class="label @test.Status.ToString().ToLower()">@test.Status.ToString()</span>
-                                                                </td>
-                                                                @if (Model.TestSuiteList.Count > 0 && Model.TestSuiteList[ix].TestList.Where(x => !String.IsNullOrEmpty(x.StatusMessage)).Count() > 0) 
-                                                                {
-                                                                    if (!String.IsNullOrEmpty(@test.StatusMessage)) 
-                                                                    {
-                                                                        <td>
-                                                                            <button type="button" class="btn" data-toggle="modal" data-target="#modal2">Message</button>
-                                                                            <pre class="hide">@test.StatusMessage.Replace("<", "&lt;").Replace(">", "&gt;")</pre>
-                                                                        </td>
-                                                                    }
-                                                                    else 
-                                                                    {
-                                                                        <td class="grey lighten-4"></td>
-                                                                    }
-                                                                }
-                                                            </tr>
-                                                        }
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </li>
-                                    }
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="col">
-                            <div class="card-panel suite-details no-margin-v v-spacer">
-                                <h5 class="suite-name-displayed"></h5>
-                                    <ul id="tests-dropdown" class="dropdown-content">
-                                    @foreach (var status in Model.StatusList.Distinct().ToList())
-                                    {
-                                        <li class="@status.ToString()"><a href="#!">@status.ToString()</a></li>
-                                    }
-                                    </ul>
-                                    <a type="button" class="small material-icons btn dropdown-button" href="#" data-activates="tests-dropdown" data-hover="true" title="Filter tests">list</a>
-                                    <button type="button" class="btn clear">Clear</button>
-                                <div class="details-container"></div>
-                            </div>
+                <div class="col l6 dashboard">
+                    <div class="card-panel horizontal">
+                        <div class="card-title"><b>Run info</b></div>
+                        <div class="card-content run-info">
+                            <table class="striped">
+                                <tr>
+                                    <td><b>Test results file</b></td>
+                                    <td>@Model.RunInfo["Test results file"]</td>
+                                </tr>
+                                <tr>
+                                    <td><b>Assembly name</b></td>
+                                    <td>@Model.RunInfo["Assembly name"]</td>
+                                </tr>
+                                <tr>
+                                    <td><b>Test framework</b></td>
+                                    <td><span style="margin-right:10px">@Model.RunInfo["Test framework"].Split()[0]</span>@Model.RunInfo["Test framework"].Split()[1]</td>
+                                </tr>
+                                <tr>
+                                    <td><b>Finished</b></td>
+                                    <td><span style="margin-right:10px">@Model.RunInfo["Run date"]</span>@Model.RunInfo["Run time"]</td>
+                                </tr>
+                                <tr>
+                                    <td><b>Time</b></td>
+                                    <td>@Model.Duration s</td>
+                                </tr>
+                            </table>
                         </div>
                     </div>
                 </div>
-                }
+            </div>
+            <div class="row">                   
+                <div class="col l2">
+                    <div class="card-panel">
+                        <div class="card-title"><b>Filters</b></div>
+                        <div class="card-content filters">
+                            <div class="status-filter">
+                                <h7><b>Status</b></h7>
+                                <div class="input-field col l12">
+                                    <select id="status-select">
+                                        <option value="" disabled selected>Choose Status</option>
+                                        <option value="0">All Status</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="collection-filter">
+                                <h7><b>Collections</b></h7>
+                                <div class="input-field col l12">
+                                    <select id="collection-select">
+                                        <option value="" disabled selected>Choose Collection</option>
+                                        <option value="0">All Collections</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="trait-filter">
+                                <h7><b>Traits</b></h7>
+                                <div class="input-field col l12">
+                                    <select id="trait-select">
+                                        <option value="" disabled selected>Choose Trait</option>
+                                        <option value="0">All Traits</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div id="clear-filters" class="waves-effect waves-light btn red lighten-2">Clear</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col l10">
+                    <div class="card-panel">
+                        <div class="card-title"><b>Test Summary</b></div>
+                        <div class="card-content">
+                            <ul id="test-list" class="collapsible">
+                                @foreach (TestSuite suite in Model.TestSuiteList)
+                                {
+                                    foreach (Test test in suite.TestList)
+                                    {
+                                        <li class="test">
+                                            <div class="collapsible-header test-name @test.Status.ToString().ToLower()">
+                                                <i class="material-icons">expand_more</i>
+                                                @test.Name
+                                                @{
+                                                    string color = "grey";
+                                                    switch (test.Status)
+                                                    {
+                                                        case Status.Passed:
+                                                            color = "green";
+                                                            break;
+                                                        case Status.Failed:
+                                                            color = "red";
+                                                            break;
+                                                        case Status.Skipped:
+                                                            color = "blue";
+                                                            break;
+                                                    }
+                                                    <span class="new badge @color" data-badge-caption="@test.Status"></span>
+                                                }
+                                            </div>
+                                            <div class="collapsible-body">
+                                                <table class="striped">
+                                                    <tr class="collection-name">
+                                                        <td><b>Collection name</b></td>
+                                                        <td>@suite.Name</td>
+                                                    </tr>
+                                                    <tr class="trait-name">
+                                                        <td><b>Traits</b></td>
+                                                        @{
+                                                            string traits = "";
+                                                            if (test.CategoryList.Count > 0)
+                                                            {
+                                                                for (int i = 0; i < test.CategoryList.Count; i++)
+                                                                {
+                                                                    traits += test.CategoryList[i];
+                                                                    if (i != test.CategoryList.Count - 1)
+                                                                    {
+                                                                        traits += ";";
+                                                                    }
+                                                                }
+                                                            }
+                                                            else
+                                                            {
+                                                                traits = "No traits found";
+                                                            }
+                                                            <td>@traits</td>
+                                                        }
+                                                    </tr>
+                                                    <tr>
+                                                        <td><b>Duration</b></td>
+                                                        <td>@test.Duration s</td>
+                                                    </tr>
+                                                </table>
+                                                <p><b>Message</b></p>
+                                                <p>@test.StatusMessage</p>
+                                                <p>STACK TRACE</p>
+                                                <p>@test.StackTrace</p>
+                                            </div>
+                                        </li>
+                                    }
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-        <div id="modal1" class="modal">
-            <div class="modal-content">
-                <h4><!--%FILENAME%--> RunInfo</h4>
-                <table class="bordered">
-                    <thead>
-                        <tr>
-                            <th>Param</th><th>Value</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>    
-                            <td>TestRunner</td>
-                            <td>@Model.TestRunner.ToString()</td>
-                        </tr>
-                        @if (Model.RunInfo != null)
-                        {
-                            foreach (var key in Model.RunInfo.Keys)
-                            {
-                                <tr>
-                                    <td>@key</td>
-                                    <td>@Model.RunInfo[key]</td>
-                                </tr>
-                            }
-                        }
-                    </tbody>
-                </table>
-            </div>
-            <div class="modal-footer">
-                <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Close</a>
-            </div>
-            <div class="hidden total-tests"><!--%TOTALTESTS%--></div>
-            <div class="hidden total-passed"><!--%PASSED%--></div>
-            <div class="hidden total-failed"><!--%FAILED%--></div>
-            <div class="hidden total-errors"><!--%ERRORS%--></div>
-            <div class="hidden total-skipped"><!--%SKIPPED%--></div>
-        </div>
-		
-        <div id="modal2" class="modal">
-		    <div class="modal-content">
-                <div class="modal-header">
-                    <h4 id="modal-title"></h4>
-                </div>
-		        <div class="modal-body">
-                    <div id="modal-message">No message found</div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js" type="text/javascript"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" type="text/javascript"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.2/js/materialize.min.js" type="text/javascript"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.1.1/Chart.min.js" type="text/javascript"></script>
-        <script src="file:///C:/Users/roberto/Documents/Visual Studio 2017/Projects/ReportUnit/cdn/reportunit.js" type="text/javascript"></script>
-
     </body>
 </html>

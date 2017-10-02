@@ -76,19 +76,30 @@ namespace ReportUnit.Parser
 
                     // get test case level categories
                     HashSet<string> categories = GetCategories(tc, true);
+                    if (categories.Count > 0)
+                    {
+                        test.CategoryList = categories.ToList<string>();
+                    }
 
                     // error and other status messages
                     XElement failure = tc.Element("failure");
                     if (failure != null)
                     {
-                        string exceptionType = failure.Attribute("exception-type").Value;
-                        test.StatusMessage = exceptionType != null ? string.Concat(exceptionType, Environment.NewLine) : "";
+                        //string exceptionType = failure.Attribute("exception-type").Value;
+                        //test.StatusMessage = exceptionType != null ? string.Concat(exceptionType, Environment.NewLine) : "";
 
                         string message = failure.Element("message").Value;
-                        test.StatusMessage += message != null ? string.Concat(message, Environment.NewLine) : "";
+                        test.StatusMessage = message != null ? message : "";
 
                         string stackTrace = failure.Element("stack-trace").Value;
-                        test.StatusMessage += stackTrace != null ? string.Concat(stackTrace, Environment.NewLine) : "";
+                        test.StackTrace = stackTrace != null ? stackTrace : "";
+                    }
+
+                    //reason for skipping a test
+                    XElement reason = tc.Element("reason");
+                    if (reason != null)
+                    {
+                        test.StatusMessage = reason.Value;
                     }
 
                     testSuite.TestList.Add(test);
@@ -129,7 +140,7 @@ namespace ReportUnit.Parser
                 {
                     string cat = x.Attribute("name").Value;
                     string val = x.Attribute("value").Value;
-                    categories.Add(string.Concat(cat, ";" , val));
+                    categories.Add(string.Concat(cat, ":" , val));
                 });
             }
 
