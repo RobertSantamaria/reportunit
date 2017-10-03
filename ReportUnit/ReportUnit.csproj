@@ -84,14 +84,6 @@
     <EmbeddedResource Include="Resources\Templates\File.cshtml" />
     <None Include="Resources\Templates\Summary.cshtml" />
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="Resources\reportunit.css">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\reportunit.js">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>
